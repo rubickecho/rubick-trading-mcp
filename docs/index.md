@@ -47,3 +47,9 @@ MCP Server
 
 测试策略
 - testing_strategy.md
+
+交易所接入
+- exchange_access.md
+
+集成测试
+- integration_testing.md

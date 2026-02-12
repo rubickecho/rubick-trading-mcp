@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "lib": ["ES2020"],
+    "types": ["node"],
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@rubick-trading-mcp/core-utils": ["packages/core-utils/src/index.ts"],
+      "@rubick-trading-mcp/core-schema": ["packages/core-schema/src/index.ts"],
+      "@rubick-trading-mcp/provider-okx": ["packages/provider-okx/src/index.ts"],
+      "@rubick-trading-mcp/provider-binance": ["packages/provider-binance/src/index.ts"],
+      "@rubick-trading-mcp/provider-hyperliquid": ["packages/provider-hyperliquid/src/index.ts"],
+      "@rubick-trading-mcp/mcp-server": ["packages/mcp-server/src/index.ts"]
+    },
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  }
+}

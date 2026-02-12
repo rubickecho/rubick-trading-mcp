@@ -105,22 +105,25 @@ packages/
 ---
 
 ## 九、执行步骤（建议顺序）
-1. 搭建 monorepo / pnpm workspace
-2. core-utils
+1. 搭建 monorepo / pnpm workspace（已完成）
+2. core-utils（已完成）
    - HTTP 请求封装（统一超时/重试/限频）
-   - OKX / Binance / Hyperliquid 签名工具
-3. provider 层
+   - OKX / Binance 签名工具
+3. provider 层（已完成）
    - OKX / Binance USD‑M / Hyperliquid
    - 只返回 raw
-4. core-schema / normalizer
-   - 实现 normalized schema + mapping
-5. mcp-server
+4. core-schema / normalizer（已完成）
+   - 账户 + OKX 行情 normalized schema + mapping
+   - 兼容 Hyperliquid clearinghouseState 实际返回
+5. mcp-server（已完成）
    - 工具注册
    - 路由到 provider
    - 归一化输出
-6. 联调
-   - 每个工具最小调用
-   - 验证输出结构符合 MCP
+   - HTTP/STDIO 入口
+   - 输入校验
+6. 联调（已完成）
+   - OKX / Binance / Hyperliquid 集成测试已跑通
+   - 新增 `pnpm test:integration` 脚本
 
 ---
 

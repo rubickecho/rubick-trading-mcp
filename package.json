@@ -1,0 +1,16 @@
+{
+  "name": "rubick-trading-mcp",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "vitest run",
+    "test:integration": "node scripts/run-integration-tests.cjs",
+    "lint": "pnpm -r run lint"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.8",
+    "zod": "^3.24.1"
+  }
+}

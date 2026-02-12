@@ -37,6 +37,18 @@ export type MarketToolInput = {
 
 export type McpContent = { type: "text"; text: string };
 
+export type McpErrorCode =
+  | "INVALID_INPUT"
+  | "PROVIDER_ERROR"
+  | "OUTPUT_SCHEMA_ERROR"
+  | "INTERNAL_ERROR";
+
+export type McpError = {
+  code: McpErrorCode;
+  message: string;
+  details?: unknown;
+};
+
 export type McpResponse<T = unknown> = {
   content: McpContent[];
   structuredContent: {
@@ -45,4 +57,14 @@ export type McpResponse<T = unknown> = {
   } | null;
   outputSchema: unknown;
   isError: boolean;
+  error?: McpError;
+  meta?: {
+    requestId?: string;
+  };
+};
+
+export type McpEnvelope<T = unknown> = {
+  id?: string;
+  result?: McpResponse<T>;
+  error?: McpError;
 };

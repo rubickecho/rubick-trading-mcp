@@ -73,7 +73,7 @@ describe("http handler", () => {
     const callResult = await call.done;
     expect(callResult.statusCode).toBe(200);
     const callJson = JSON.parse(callResult.body);
-    expect(callJson.isError).toBe(false);
+    expect(callJson.result?.isError).toBe(false);
   });
 
   it("returns 400 on invalid json", async () => {

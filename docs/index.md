@@ -35,6 +35,7 @@ Provider 契约
 
 MCP Server
 - mcp_server_tools_registry.md
+ - mcp_tools_catalog.md
 
 市场数据 Schema
 - normalized_schema_market_okx.md

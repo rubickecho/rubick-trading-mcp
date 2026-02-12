@@ -46,6 +46,11 @@ function getBalanceQuery(params: AccountToolParams): Record<string, string | num
   return ccy ? { ccy } : {};
 }
 
+function getInstType(params: AccountToolParams): string | undefined {
+  const instType = params.extra?.instType;
+  return typeof instType === "string" && instType.length > 0 ? instType : undefined;
+}
+
 async function okxGet<T>(options: OkxProviderOptions, path: string, query?: Record<string, string | number | undefined>): Promise<T> {
   const baseUrl = options.baseUrl ?? DEFAULT_BASE_URL;
   const requestPath = buildRequestPath(path, query);
@@ -118,6 +123,10 @@ export async function getPendingOrders(options: OkxProviderOptions, params: Acco
   if (params.instId) {
     query.instId = params.instId;
   }
+  const instType = getInstType(params);
+  if (instType) {
+    query.instType = instType;
+  }
   return okxGet(options, "/api/v5/trade/orders-pending", query);
 }
 
@@ -125,6 +134,10 @@ export async function getHistoryOrders(options: OkxProviderOptions, params: Acco
   const query: Record<string, string | number | undefined> = {};
   if (params.instId) {
     query.instId = params.instId;
+  }
+  const instType = getInstType(params);
+  if (instType) {
+    query.instType = instType;
   }
   if (params.since) {
     query.begin = params.since;

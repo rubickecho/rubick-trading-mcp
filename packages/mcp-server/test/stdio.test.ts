@@ -12,7 +12,8 @@ describe("stdio responder", () => {
   it("returns error on invalid json", async () => {
     const responder = createStdioResponder(dispatch);
     const response = await responder("{");
-    expect(response).toContain("invalid json");
+    const parsed = JSON.parse(response ?? "{}");
+    expect(parsed.error?.code).toBe("INVALID_INPUT");
   });
 
   it("returns result with id", async () => {

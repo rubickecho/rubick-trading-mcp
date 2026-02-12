@@ -5,9 +5,11 @@ import {
   normalizeOkxOrderBook,
   normalizeOkxTicker
 } from "@rubick-trading-mcp/core-schema";
-import type { MarketToolInput, MarketToolName, McpResponse } from "../types";
-import { validateMarketToolInput } from "../validation";
+import type { MarketToolInput, MarketToolName, McpResponse, McpErrorCode } from "../types";
+import { validateMarketToolInput, validateSchema } from "../validation";
+import { marketToolInputSchema } from "../schemas";
 import { OUTPUT_SCHEMA_MAP } from "../tools/schemaMap";
+import { buildMarketSummary } from "../summary";
 
 export type MarketProvider = {
   getTicker(params: MarketToolInput): Promise<unknown>;
@@ -17,12 +19,21 @@ export type MarketProvider = {
   getOpenInterest(params: MarketToolInput): Promise<unknown>;
 };
 
-function errorResponse(message: string): McpResponse<null> {
+function errorResponse(code: McpErrorCode, message: string, details?: unknown): McpResponse<null> {
+  const requestId = `req_${Math.random().toString(36).slice(2, 10)}`;
   return {
     content: [{ type: "text", text: message }],
     structuredContent: null,
     outputSchema: null,
-    isError: true
+    isError: true,
+    error: {
+      code,
+      message,
+      details
+    },
+    meta: {
+      requestId
+    }
   };
 }
 
@@ -39,9 +50,13 @@ export async function handleMarketTool(
   input: MarketToolInput,
   provider: MarketProvider
 ): Promise<McpResponse<unknown>> {
+  const inputSchemaCheck = validateSchema(marketToolInputSchema, input);
+  if (!inputSchemaCheck.valid) {
+    return errorResponse("INVALID_INPUT", "input schema validation failed", inputSchemaCheck.errors);
+  }
   const validationError = validateMarketToolInput(input);
   if (validationError) {
-    return errorResponse(validationError);
+    return errorResponse("INVALID_INPUT", validationError);
   }
 
   try {
@@ -69,17 +84,27 @@ export async function handleMarketTool(
         normalized = normalizeOkxOpenInterest(raw as never);
         break;
       default:
-        return errorResponse(`unsupported tool: ${tool}`);
+        return errorResponse("INVALID_INPUT", `unsupported tool: ${tool}`);
     }
 
+    const outputSchema = OUTPUT_SCHEMA_MAP[tool];
+    const outputCheck = validateSchema(outputSchema, normalized);
+    if (!outputCheck.valid) {
+      return errorResponse("OUTPUT_SCHEMA_ERROR", "output schema validation failed", outputCheck.errors);
+    }
+
+    const requestId = `req_${Math.random().toString(36).slice(2, 10)}`;
     return {
-      content: [{ type: "text", text: "ok" }],
+      content: [{ type: "text", text: buildMarketSummary(tool, normalized) }],
       structuredContent: { raw, normalized },
-      outputSchema: OUTPUT_SCHEMA_MAP[tool],
-      isError: false
+      outputSchema,
+      isError: false,
+      meta: {
+        requestId
+      }
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown error";
-    return errorResponse(message);
+    return errorResponse("PROVIDER_ERROR", message);
   }
 }

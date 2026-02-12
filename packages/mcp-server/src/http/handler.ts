@@ -1,6 +1,6 @@
 import type http from "node:http";
 import { TOOL_REGISTRY } from "../tools/registry";
-import type { McpResponse } from "../types";
+import type { McpEnvelope, McpResponse } from "../types";
 
 export type Dispatcher = (toolName: string, input: unknown) => Promise<McpResponse<unknown>>;
 
@@ -22,21 +22,29 @@ async function handleCall(req: http.IncomingMessage, res: http.ServerResponse, d
     body += chunk;
   });
   req.on("end", async () => {
-    let payload: { tool?: string; input?: unknown };
+    let payload: { id?: string; tool?: string; input?: unknown };
     try {
       payload = JSON.parse(body || "{}");
     } catch {
-      jsonResponse(res, 400, { error: "invalid json" });
+      const envelope: McpEnvelope = {
+        error: { code: "INVALID_INPUT", message: "invalid json" }
+      };
+      jsonResponse(res, 400, envelope);
       return;
     }
 
     if (!payload.tool) {
-      jsonResponse(res, 400, { error: "tool is required" });
+      const envelope: McpEnvelope = {
+        id: payload.id,
+        error: { code: "INVALID_INPUT", message: "tool is required" }
+      };
+      jsonResponse(res, 400, envelope);
       return;
     }
 
     const result = await dispatch(payload.tool, payload.input ?? {});
-    jsonResponse(res, 200, result);
+    const envelope: McpEnvelope = { id: payload.id, result };
+    jsonResponse(res, 200, envelope);
   });
 }
 

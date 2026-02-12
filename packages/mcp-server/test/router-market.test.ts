@@ -24,6 +24,7 @@ describe("market router", () => {
   it("returns error when instId missing", async () => {
     const response = await handleMarketTool("get_candles", { exchange: "okx" }, provider);
     expect(response.isError).toBe(true);
+    expect(response.error?.code).toBe("INVALID_INPUT");
   });
 
   it("returns error when depth invalid", async () => {

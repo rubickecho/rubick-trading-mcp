@@ -5,6 +5,7 @@
     "build": "pnpm -r run build",
     "test": "vitest run",
     "test:integration": "node scripts/run-integration-tests.cjs",
+    "docs:tools": "node scripts/generate-tools-docs.cjs",
     "lint": "pnpm -r run lint"
   },
   "devDependencies": {

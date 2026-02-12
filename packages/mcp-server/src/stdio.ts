@@ -1,5 +1,5 @@
 import readline from "node:readline";
-import type { McpResponse } from "./types";
+import type { McpResponse, McpError, McpEnvelope } from "./types";
 
 export type StdioDispatcher = (toolName: string, input: unknown) => Promise<McpResponse<unknown>>;
 
@@ -9,11 +9,7 @@ type StdioRequest = {
   input?: unknown;
 };
 
-type StdioEnvelope = {
-  id?: string;
-  result?: McpResponse<unknown>;
-  error?: string;
-};
+type StdioEnvelope = McpEnvelope;
 
 export function createStdioResponder(dispatch: StdioDispatcher) {
   return async (line: string): Promise<string | null> => {
@@ -25,13 +21,21 @@ export function createStdioResponder(dispatch: StdioDispatcher) {
     try {
       payload = JSON.parse(trimmed);
     } catch {
-      return JSON.stringify({ error: "invalid json" } satisfies StdioEnvelope);
+      const envelope: StdioEnvelope = {
+        error: { code: "INVALID_INPUT", message: "invalid json" }
+      };
+      return JSON.stringify(envelope);
     }
     if (!payload.tool) {
-      return JSON.stringify({ id: payload.id, error: "tool is required" } satisfies StdioEnvelope);
+      const envelope: StdioEnvelope = {
+        id: payload.id,
+        error: { code: "INVALID_INPUT", message: "tool is required" }
+      };
+      return JSON.stringify(envelope);
     }
     const result = await dispatch(payload.tool, payload.input ?? {});
-    return JSON.stringify({ id: payload.id, result } satisfies StdioEnvelope);
+    const envelope: StdioEnvelope = { id: payload.id, result };
+    return JSON.stringify(envelope);
   };
 }
 

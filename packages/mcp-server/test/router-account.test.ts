@@ -56,5 +56,16 @@ describe("account router", () => {
       providers
     );
     expect(response.isError).toBe(true);
+    expect(response.error?.code).toBe("INVALID_INPUT");
+  });
+
+  it("rejects unknown fields by schema", async () => {
+    const response = await handleAccountTool(
+      "get_balance",
+      { exchange: "okx", foo: "bar" } as never,
+      providers
+    );
+    expect(response.isError).toBe(true);
+    expect(response.error?.code).toBe("INVALID_INPUT");
   });
 });

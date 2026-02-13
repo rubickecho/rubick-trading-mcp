@@ -17,6 +17,7 @@ import { validateAccountToolInput, validateSchema } from "../validation";
 import { accountToolInputSchema } from "../schemas";
 import { OUTPUT_SCHEMA_MAP } from "../tools/schemaMap";
 import { buildAccountSummary } from "../summary";
+import { deriveAccount, DERIVED_SCHEMA_MAP } from "../derived";
 
 export type AccountProvider = {
   getBalance(params: AccountToolInput): Promise<unknown>;
@@ -111,10 +112,21 @@ export async function handleAccountTool(
       return errorResponse("OUTPUT_SCHEMA_ERROR", "output schema validation failed", outputCheck.errors);
     }
 
+    const derived = deriveAccount(tool, input, normalized);
+    if (derived) {
+      const derivedSchema = DERIVED_SCHEMA_MAP[tool];
+      if (derivedSchema) {
+        const derivedCheck = validateSchema(derivedSchema, derived);
+        if (!derivedCheck.valid) {
+          return errorResponse("OUTPUT_SCHEMA_ERROR", "derived schema validation failed", derivedCheck.errors);
+        }
+      }
+    }
+
     const requestId = `req_${Math.random().toString(36).slice(2, 10)}`;
     return {
       content: [{ type: "text", text: buildAccountSummary(tool, normalized) }],
-      structuredContent: { raw, normalized },
+      structuredContent: { raw, normalized, derived: derived ?? undefined },
       outputSchema,
       isError: false,
       meta: {

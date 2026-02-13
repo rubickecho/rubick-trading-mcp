@@ -24,8 +24,15 @@ async function readJson(response: Response) {
   return text ? JSON.parse(text) : {};
 }
 
+function expectDerivedEnvelope(derived: Record<string, any>) {
+  expect(derived).toBeTruthy();
+  expect(derived.version).toBe("v1");
+  expect(derived.level).toBe("basic");
+  expect(derived.features).toBeTruthy();
+}
+
 function expectAccountNormalized(tool: string, result: Record<string, any>, exchange: string) {
-  const normalized = result?.structuredContent;
+  const normalized = result?.structuredContent?.normalized;
   expect(normalized).toBeTruthy();
   expect(normalized.exchange).toBe(exchange);
   expect(typeof normalized.timestamp).toBe("string");
@@ -36,10 +43,17 @@ function expectAccountNormalized(tool: string, result: Record<string, any>, exch
   } else {
     expect(Array.isArray(normalized.orders)).toBe(true);
   }
+
+  const derived = result?.structuredContent?.derived;
+  if (exchange === "okx") {
+    expectDerivedEnvelope(derived);
+  } else {
+    expect(derived).toBeUndefined();
+  }
 }
 
 function expectMarketNormalized(tool: string, result: Record<string, any>) {
-  const normalized = result?.structuredContent;
+  const normalized = result?.structuredContent?.normalized;
   expect(normalized).toBeTruthy();
   expect(normalized.exchange).toBe("okx");
   expect(typeof normalized.instId).toBe("string");
@@ -57,6 +71,9 @@ function expectMarketNormalized(tool: string, result: Record<string, any>) {
   } else if (tool === "get_open_interest") {
     expect(typeof normalized.openInterest).toBe("number");
   }
+
+  const derived = result?.structuredContent?.derived;
+  expectDerivedEnvelope(derived);
 }
 
 async function callTool(baseUrl: string, name: string, args: Record<string, unknown>) {

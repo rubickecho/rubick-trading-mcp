@@ -32,6 +32,10 @@ describe("hyperliquid provider", () => {
 
     expect(captured?.method).toBe("POST");
     expect(captured?.url).toBe("https://api.hyperliquid.xyz/info");
-    expect((captured?.body as Record<string, unknown>)?.type).toBe("openOrders");
+    const payload =
+      typeof captured?.body === "string"
+        ? (JSON.parse(captured.body) as Record<string, unknown>)
+        : (captured?.body as Record<string, unknown> | undefined);
+    expect(payload?.type).toBe("openOrders");
   });
 });

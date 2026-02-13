@@ -6,6 +6,7 @@ export default defineConfig({
     alias: {
       "@rubick-trading-mcp/core-utils": resolve(__dirname, "packages/core-utils/src/index.ts"),
       "@rubick-trading-mcp/core-schema": resolve(__dirname, "packages/core-schema/src/index.ts"),
+      "@rubick-trading-mcp/core-derived": resolve(__dirname, "packages/core-derived/src/index.ts"),
       "@rubick-trading-mcp/provider-okx": resolve(__dirname, "packages/provider-okx/src/index.ts"),
       "@rubick-trading-mcp/provider-binance": resolve(__dirname, "packages/provider-binance/src/index.ts"),
       "@rubick-trading-mcp/provider-hyperliquid": resolve(__dirname, "packages/provider-hyperliquid/src/index.ts"),

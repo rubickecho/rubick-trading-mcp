@@ -44,13 +44,12 @@ function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 function toToolResult(result: McpResponse<unknown>) {
-  const normalized = result.structuredContent?.normalized;
   const base: Record<string, unknown> = {
     content: result.content,
     isError: result.isError
   };
-  if (normalized !== undefined && normalized !== null) {
-    base.structuredContent = normalized;
+  if (result.structuredContent !== undefined && result.structuredContent !== null) {
+    base.structuredContent = result.structuredContent;
   }
   if (result.meta?.requestId) {
     base._meta = { requestId: result.meta.requestId };

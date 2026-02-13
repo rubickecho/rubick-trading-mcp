@@ -14,6 +14,7 @@
     "paths": {
       "@rubick-trading-mcp/core-utils": ["packages/core-utils/src/index.ts"],
       "@rubick-trading-mcp/core-schema": ["packages/core-schema/src/index.ts"],
+      "@rubick-trading-mcp/core-derived": ["packages/core-derived/src/index.ts"],
       "@rubick-trading-mcp/provider-okx": ["packages/provider-okx/src/index.ts"],
       "@rubick-trading-mcp/provider-binance": ["packages/provider-binance/src/index.ts"],
       "@rubick-trading-mcp/provider-hyperliquid": ["packages/provider-hyperliquid/src/index.ts"],

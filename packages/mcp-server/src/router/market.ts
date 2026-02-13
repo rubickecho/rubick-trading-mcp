@@ -10,6 +10,7 @@ import { validateMarketToolInput, validateSchema } from "../validation";
 import { marketToolInputSchema } from "../schemas";
 import { OUTPUT_SCHEMA_MAP } from "../tools/schemaMap";
 import { buildMarketSummary } from "../summary";
+import { deriveMarket, DERIVED_SCHEMA_MAP } from "../derived";
 
 export type MarketProvider = {
   getTicker(params: MarketToolInput): Promise<unknown>;
@@ -93,10 +94,21 @@ export async function handleMarketTool(
       return errorResponse("OUTPUT_SCHEMA_ERROR", "output schema validation failed", outputCheck.errors);
     }
 
+    const derived = deriveMarket(tool, input, normalized);
+    if (derived) {
+      const derivedSchema = DERIVED_SCHEMA_MAP[tool];
+      if (derivedSchema) {
+        const derivedCheck = validateSchema(derivedSchema, derived);
+        if (!derivedCheck.valid) {
+          return errorResponse("OUTPUT_SCHEMA_ERROR", "derived schema validation failed", derivedCheck.errors);
+        }
+      }
+    }
+
     const requestId = `req_${Math.random().toString(36).slice(2, 10)}`;
     return {
       content: [{ type: "text", text: buildMarketSummary(tool, normalized) }],
-      structuredContent: { raw, normalized },
+      structuredContent: { raw, normalized, derived: derived ?? undefined },
       outputSchema,
       isError: false,
       meta: {

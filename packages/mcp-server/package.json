@@ -10,6 +10,7 @@
     "lint": "node -e \"process.exit(0)\""
   },
   "dependencies": {
+    "@rubick-trading-mcp/core-derived": "workspace:*",
     "ajv": "^8.12.0",
     "@rubick-trading-mcp/core-schema": "workspace:*",
     "@rubick-trading-mcp/core-utils": "workspace:*",

@@ -54,6 +54,7 @@ export type McpResponse<T = unknown> = {
   structuredContent: {
     raw: unknown;
     normalized: T;
+    derived?: unknown;
   } | null;
   outputSchema: unknown;
   isError: boolean;

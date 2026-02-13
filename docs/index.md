@@ -54,3 +54,6 @@ MCP Server
 
 集成测试
 - integration_testing.md
+
+深度数据处理设计
+- derived_data_design.md

@@ -10,8 +10,7 @@ describeBinance("binance integration", () => {
     "fetches account endpoints",
     async () => {
       const client = createFetchClient({
-        timeoutMs: 10000,
-        proxyUrl: process.env.BINANCE_PROXY_URL ?? process.env.HTTPS_PROXY ?? process.env.HTTP_PROXY
+        timeoutMs: 20000
       });
 
       const options = {
@@ -34,6 +33,6 @@ describeBinance("binance integration", () => {
       expect(Array.isArray(pending)).toBe(true);
       expect(Array.isArray(history)).toBe(true);
     },
-    20000
+    30000
   );
 });

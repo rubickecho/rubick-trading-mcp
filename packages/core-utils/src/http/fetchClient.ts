@@ -1,22 +1,16 @@
 import { buildUrl } from "./utils";
 import type { HttpClient, HttpRequest, HttpResponse } from "./types";
-import { ProxyAgent } from "undici";
 
 export type FetchClientOptions = {
   baseUrl?: string;
   timeoutMs?: number;
   defaultHeaders?: Record<string, string>;
-  proxyUrl?: string;
-  proxyDispatcher?: unknown;
 };
 
 export function createFetchClient(options: FetchClientOptions = {}): HttpClient {
   const baseUrl = options.baseUrl;
   const defaultHeaders = options.defaultHeaders ?? {};
   const defaultTimeout = options.timeoutMs;
-  const dispatcher =
-    options.proxyDispatcher ?? (options.proxyUrl ? new ProxyAgent(options.proxyUrl) : undefined);
-
   return {
     async request<T = unknown>(req: HttpRequest): Promise<HttpResponse<T>> {
       const url = buildUrl(baseUrl, req.url, req.query);
@@ -48,11 +42,8 @@ export function createFetchClient(options: FetchClientOptions = {}): HttpClient 
         body,
         signal: controller.signal
       };
-      if (dispatcher) {
-        (fetchOptions as Record<string, unknown>).dispatcher = dispatcher;
-      }
 
-        const response = await fetch(url, fetchOptions);
+      const response = await fetch(url, fetchOptions);
         const rawBody = await response.text();
         let data: T;
         try {

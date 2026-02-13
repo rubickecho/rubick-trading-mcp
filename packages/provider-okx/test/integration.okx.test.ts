@@ -26,8 +26,7 @@ describeOkx("okx integration", () => {
     "fetches account endpoints",
     async () => {
       const client = createFetchClient({
-        timeoutMs: 10000,
-        proxyUrl: process.env.OKX_PROXY_URL ?? process.env.HTTPS_PROXY ?? process.env.HTTP_PROXY
+        timeoutMs: 20000
       });
 
       const baseOptions = {
@@ -50,15 +49,14 @@ describeOkx("okx integration", () => {
       expect(pending.code).toBe("0");
       expect(history.code).toBe("0");
     },
-    20000
+    30000
   );
 
   it(
     "fetches market endpoints",
     async () => {
       const client = createFetchClient({
-        timeoutMs: 10000,
-        proxyUrl: process.env.OKX_PROXY_URL ?? process.env.HTTPS_PROXY ?? process.env.HTTP_PROXY
+        timeoutMs: 20000
       });
 
       const ticker = await getTicker({ client, credentials: { apiKey: "", apiSecret: "", passphrase: "" } }, { instId });
@@ -74,6 +72,6 @@ describeOkx("okx integration", () => {
       expect(funding.code).toBe("0");
       expect(openInterest.code).toBe("0");
     },
-    20000
+    30000
   );
 });

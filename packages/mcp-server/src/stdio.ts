@@ -1,46 +1,43 @@
 import readline from "node:readline";
-import type { McpResponse, McpError, McpEnvelope } from "./types";
+import type { McpResponse } from "./types";
+import { handleJsonRpcMessage, SUPPORTED_PROTOCOL_VERSION, type JsonRpcDispatcher, type ServerInfo } from "./protocol";
+import { makeJsonRpcError } from "./jsonrpc";
 
 export type StdioDispatcher = (toolName: string, input: unknown) => Promise<McpResponse<unknown>>;
 
-type StdioRequest = {
-  id?: string;
-  tool?: string;
-  input?: unknown;
-};
+export function createStdioResponder(
+  dispatch: StdioDispatcher,
+  options?: { serverInfo?: ServerInfo; protocolVersion?: string }
+) {
+  const serverInfo: ServerInfo = options?.serverInfo ?? { name: "rubick-trading-mcp", version: "0.1.0" };
+  const protocolVersion = options?.protocolVersion ?? SUPPORTED_PROTOCOL_VERSION;
+  const handler: JsonRpcDispatcher = dispatch;
 
-type StdioEnvelope = McpEnvelope;
-
-export function createStdioResponder(dispatch: StdioDispatcher) {
   return async (line: string): Promise<string | null> => {
     const trimmed = line.trim();
     if (!trimmed) {
       return null;
     }
-    let payload: StdioRequest;
+    let payload: unknown;
     try {
       payload = JSON.parse(trimmed);
     } catch {
-      const envelope: StdioEnvelope = {
-        error: { code: "INVALID_INPUT", message: "invalid json" }
-      };
-      return JSON.stringify(envelope);
+      return JSON.stringify(makeJsonRpcError(null, -32700, "Parse error"));
     }
-    if (!payload.tool) {
-      const envelope: StdioEnvelope = {
-        id: payload.id,
-        error: { code: "INVALID_INPUT", message: "tool is required" }
-      };
-      return JSON.stringify(envelope);
+    const result = await handleJsonRpcMessage(payload, {
+      dispatch: handler,
+      serverInfo,
+      protocolVersion
+    });
+    if (result.type === "accepted") {
+      return null;
     }
-    const result = await dispatch(payload.tool, payload.input ?? {});
-    const envelope: StdioEnvelope = { id: payload.id, result };
-    return JSON.stringify(envelope);
+    return JSON.stringify(result.response);
   };
 }
 
-export function startStdioServer(dispatch: StdioDispatcher) {
-  const respond = createStdioResponder(dispatch);
+export function startStdioServer(dispatch: StdioDispatcher, options?: { serverInfo?: ServerInfo; protocolVersion?: string }) {
+  const respond = createStdioResponder(dispatch, options);
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: false });
   rl.on("line", async (line) => {
     const response = await respond(line);

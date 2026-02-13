@@ -20,12 +20,9 @@
   - HYPERLIQUID_USER
 
 可选变量
-- OKX_PROXY_URL
 - OKX_INST_ID（默认 BTC-USDT-SWAP）
 - OKX_INST_TYPE（默认 SWAP）
-- BINANCE_PROXY_URL
 - BINANCE_SYMBOL（默认 BTC/USDT）
-- HYPERLIQUID_PROXY_URL
 
 执行
 - 运行全部集成测试
@@ -34,6 +31,8 @@
   - OKX: `pnpm test -- --run packages/provider-okx/test/integration.okx.test.ts`
   - Binance: `pnpm test -- --run packages/provider-binance/test/integration.binance.test.ts`
   - Hyperliquid: `pnpm test -- --run packages/provider-hyperliquid/test/integration.hyperliquid.test.ts`
+- MCP HTTP 集成测试
+  - `pnpm test -- --run packages/mcp-server/test/integration.mcp.http.test.ts`
 
 注意
 - 集成测试默认只在对应环境变量存在时运行，否则自动跳过

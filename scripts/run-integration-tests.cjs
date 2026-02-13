@@ -28,12 +28,19 @@ if (fs.existsSync(envPath)) {
 const files = [
   "packages/provider-okx/test/integration.okx.test.ts",
   "packages/provider-binance/test/integration.binance.test.ts",
-  "packages/provider-hyperliquid/test/integration.hyperliquid.test.ts"
+  "packages/provider-hyperliquid/test/integration.hyperliquid.test.ts",
+  "packages/mcp-server/test/integration.mcp.http.test.ts"
 ];
 
-const result = spawnSync("pnpm", ["exec", "vitest", "run", ...files], {
-  stdio: "inherit",
-  env: process.env
-});
+let exitCode = 0;
+for (const file of files) {
+  const result = spawnSync("pnpm", ["exec", "vitest", "run", file], {
+    stdio: "inherit",
+    env: process.env
+  });
+  if ((result.status ?? 1) !== 0) {
+    exitCode = result.status ?? 1;
+  }
+}
 
-process.exit(result.status ?? 1);
+process.exit(exitCode);

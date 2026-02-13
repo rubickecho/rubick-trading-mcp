@@ -29,12 +29,13 @@ function createFetchClient(options = {}) {
             const timeoutMs = req.timeoutMs ?? defaultTimeout;
             const timeoutId = timeoutMs ? setTimeout(() => controller.abort(), timeoutMs) : null;
             try {
-                const response = await fetch(url, {
+                const fetchOptions = {
                     method: req.method,
                     headers,
                     body,
                     signal: controller.signal
-                });
+                };
+                const response = await fetch(url, fetchOptions);
                 const rawBody = await response.text();
                 let data;
                 try {

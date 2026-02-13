@@ -19,11 +19,15 @@ function getUser(params: AccountToolParams): string {
 async function hyperliquidPost<T>(options: HyperliquidProviderOptions, body: Record<string, unknown>) {
   const baseUrl = options.baseUrl ?? DEFAULT_BASE_URL;
   const url = `${baseUrl}/info`;
+  const payload = JSON.stringify(body);
 
   const response = await options.client.request<T>({
     method: "POST",
     url,
-    body
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: payload
   });
 
   if (response.status >= 400) {

@@ -3,8 +3,8 @@ import { createFetchClient } from "../../src/http/fetchClient";
 import type { HttpRequest } from "../../src/http/types";
 
 describe("fetch client", () => {
-  it("passes proxy dispatcher when configured", async () => {
-    let captured: RequestInit & { dispatcher?: unknown } = {};
+  it("passes basic request options", async () => {
+    let captured: RequestInit = {};
 
     vi.stubGlobal(
       "fetch",
@@ -18,8 +18,7 @@ describe("fetch client", () => {
       })
     );
 
-    const proxyDispatcher = { tag: "proxy" };
-    const client = createFetchClient({ proxyDispatcher });
+    const client = createFetchClient();
     const req: HttpRequest = { method: "GET", url: "https://example.com" };
     await client.request(req);
 
